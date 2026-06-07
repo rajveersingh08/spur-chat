@@ -4,7 +4,6 @@ import server from '@adonisjs/core/services/server'
 server.errorHandler(() => import('#app/Exceptions/Handler'))
 
 server.use([
-  () => import('@adonisjs/cors/cors_middleware'),
   () => import('@adonisjs/core/bodyparser_middleware'),
 ])
 
