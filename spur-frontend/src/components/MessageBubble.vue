@@ -2,12 +2,14 @@
 import { computed } from 'vue'
 import type { ApiMessage } from '@/services/api'
 import { DotLottieVue } from '@lottiefiles/dotlottie-vue'
+import { renderMarkdown } from '@/utils/renderMarkdown'
 
 const props = defineProps<{ message: ApiMessage }>()
 const isUser = computed(() => props.message.sender === 'user')
 const formattedTime = computed(() =>
   new Date(props.message.createdAt).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
 )
+const aiHtml = computed(() => (isUser.value ? '' : renderMarkdown(props.message.text)))
 </script>
 
 <template>
@@ -34,7 +36,8 @@ const formattedTime = computed(() =>
           ? 'background: linear-gradient(135deg,#7c3aed 0%,#8b5cf6 100%); color:#fff; box-shadow:0 2px 12px rgba(124,58,237,0.25);'
           : 'background: rgba(255,255,255,0.80); border: 1px solid rgba(167,139,250,0.2); color:#374151;'"
       >
-        <p class="whitespace-pre-wrap break-words">{{ message.text }}</p>
+        <p v-if="isUser" class="whitespace-pre-wrap break-words">{{ message.text }}</p>
+        <div v-else class="markdown-content break-words" v-html="aiHtml" />
       </div>
       <span class="text-[10px] text-slate-400 px-1 select-none">{{ formattedTime }}</span>
     </div>
@@ -51,3 +54,40 @@ const formattedTime = computed(() =>
 
   </div>
 </template>
+
+<style scoped>
+.markdown-content :deep(p) {
+  margin: 0 0 0.5em;
+}
+
+.markdown-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) {
+  margin: 0.25em 0 0.5em;
+  padding-left: 1.25em;
+}
+
+.markdown-content :deep(ul) {
+  list-style-type: disc;
+}
+
+.markdown-content :deep(ol) {
+  list-style-type: decimal;
+}
+
+.markdown-content :deep(li) {
+  margin-bottom: 0.15em;
+}
+
+.markdown-content :deep(li:last-child) {
+  margin-bottom: 0;
+}
+
+.markdown-content :deep(strong),
+.markdown-content :deep(b) {
+  font-weight: 600;
+}
+</style>

@@ -105,10 +105,11 @@ Escalation phrase: "I'd recommend connecting with our support team directly at s
 - Focused: do not add unrequested information or unsolicited product recommendations.
 - Do not apologise repeatedly — one acknowledgement per issue is enough.
 - Do not mention that you are an AI or discuss your limitations unless directly asked.
+- Use Markdown formatting: **bold** for important labels (e.g. shipping methods, return conditions, policy names) and short bullet lists when listing multiple items.
+- Do NOT use Markdown tables, code blocks, fenced code, headings (#), images, or links.
 
 ## RESPONSE REQUIREMENTS
 - Answer using ONLY STORE KNOWLEDGE and the current conversation.
-- Use plain prose unless listing 3 or more distinct items, in which case a short bullet list is acceptable.
 - End each response with a follow-up offer when appropriate ("Is there anything else I can help you with?").
 - Never hallucinate. When uncertain, escalate.
 `.trim()
@@ -118,7 +119,6 @@ const CLIENT_ERRORS = {
   AUTH:       'The AI assistant is temporarily unavailable. Please try again later.',
   TIMEOUT:    'The request took too long to complete. Please try sending your message again.',
   EMPTY:      'Our AI assistant did not return a response. Please try again in a moment.',
-  INVALID:    'We could not process your message. Please check it and try again.',
   GENERIC:    'Something went wrong on our end. Please try again or contact support.',
 } as const
 
@@ -186,7 +186,7 @@ async function callOpenAI(history: ChatMessage[], userMessage: string): Promise<
     model: 'gpt-4o-mini',
     messages,
 
-    temperature: 0.3,
+    temperature: 0.2,
     top_p:       1.0,
     max_tokens:  350,
   })
@@ -202,7 +202,7 @@ export class LlmService {
         { preview: userMessage.slice(0, 100) },
         `LlmService rejected message: ${validationError}`
       )
-      return { text: CLIENT_ERRORS.INVALID }
+      return { text: validationError }
     }
 
     try {
